@@ -12,7 +12,7 @@ from yahoo_finance import Share
 
 def pull_data():
 
-	df = pd.DataFrame(columns = ['Date', 'Ticker', 'Title', 'Direction', 'Market Cap', 'Editor-Picks', 'Author-Followers', 'Initial-Stock-Price', 'Current-Stock-Price10', 'Current-Stock-Price30', 'Current-Stock-Price90', 'sp500-Price10', 'sp500-Price30', 'sp500-Price90', 'stock_change10', 'stock_change30', 'stock_change90', 'sp500_change10', 'sp500_change30', 'sp500_change90'])
+	df = pd.DataFrame(columns = ['Date', 'Ticker', 'Title', 'Direction', 'Direction_Num', 'Market Cap', 'Editor-Picks', 'Author-Followers', 'Initial-Stock-Price', 'Current-Stock-Price10', 'Current-Stock-Price30', 'Current-Stock-Price90', 'sp500-Price10', 'sp500-Price30', 'sp500-Price90', 'stock_change10', 'stock_change30', 'stock_change90', 'sp500_change10', 'sp500_change30', 'sp500_change90', 'difference10', 'difference30', 'difference90', 'status10', 'status30', 'status90'])
 
 	sp500_df = pd.DataFrame.from_csv("YAHOO-INDEX_GSPC.csv")
 
@@ -27,7 +27,7 @@ def pull_data():
 		a_date = d1 + td(days=i)
 		#print a_date
 		article_date = a_date.strftime("%Y/%m/%d")
-		print article_date
+		#print article_date
 		webpage = "http://seekingalpha.com/analysis/all/all/" + str(article_date)
 
 		#print webpage
@@ -56,7 +56,7 @@ def pull_data():
 						try:
 
 							for link in split_item:
-								print link
+								#print link
 
 								try:
 
@@ -102,11 +102,11 @@ def pull_data():
 
 										findPatTicker = re.findall(patFinderTicker, source)
 
-										print findPatTicker
+										#print findPatTicker
 
 										findPatTicker = str(findPatTicker[0])
 
-										print findPatTicker
+										#print findPatTicker
 
 										try:
 
@@ -126,22 +126,22 @@ def pull_data():
 
 												initial_stock_value = value.get_historical(str(a_date), str(end_date))
 
-												print initial_stock_value
+												#print "Value Historical:", initial_stock_value
 
 												initial_stock_value = initial_stock_value[0]['Adj_Close']
 
-												print "Initial Stock Value: ", initial_stock_value
+												#print "Initial Stock Value: ", initial_stock_value
 
 												try:
 
 													row = sp500_df[(sp500_df.index == str(end_date))]
 													initial_sp500_value = float(row["Adjusted Close"])
 
-													print "sp500 Value", sp500_value
+													#print "sp500 Value", sp500_value
 
 												except:
 													end_date = end_date - datetime.timedelta(days=3)
-													print "Except end_date", end_date
+													#print "Except end_date", end_date
 													row = sp500_df[(sp500_df.index == str(end_date))]
 													initial_sp500_value = float(row["Adjusted Close"])
 
@@ -156,11 +156,11 @@ def pull_data():
 													current_stock_value90 = value.get_historical(str(a_date), str(end_date90))[0]['Adj_Close']
 
 													try:
-														print "okay?"
+														#print "okay?"
 														stock_change10 = ((float(current_stock_value10) - float(initial_stock_value)) / float(initial_stock_value)) * 100
 														stock_change30 = ((float(current_stock_value30) - float(initial_stock_value)) / float(initial_stock_value)) * 100
 														stock_change90 = ((float(current_stock_value90) - float(initial_stock_value)) / float(initial_stock_value)) * 100
-														print "yes"
+														#print "yes"
 
 													except:
 														stock_change10 = "NA"
@@ -169,6 +169,7 @@ def pull_data():
 
 												except:
 													print "no current stock value!!!!!!!!!!!!!"
+													pass
 
 
 												try:
@@ -178,11 +179,11 @@ def pull_data():
 
 													sp500_change10 = ((float(sp500_value10) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
 
-													print "10", sp500_value10
+													#print "10", sp500_value10
 
 												except:
 													end_date10 = end_date10 - datetime.timedelta(days=3)
-													print "Except end_date10", end_date10
+													#print "Except end_date10", end_date10
 													row10 = sp500_df[(sp500_df.index == str(end_date10))]
 													sp500_value10 = float(row10["Adjusted Close"])
 
@@ -195,11 +196,11 @@ def pull_data():
 
 													sp500_change30 = ((float(sp500_value30) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
 
-													print '30', sp500_value30
+													#print '30', sp500_value30
 
 												except:
 													end_date30 = end_date30 - datetime.timedelta(days=3)
-													print "Except end_date30", end_date30
+													#print "Except end_date30", end_date30
 													row30 = sp500_df[(sp500_df.index == str(end_date30))]
 													sp500_value30 = float(row30["Adjusted Close"])
 
@@ -212,11 +213,11 @@ def pull_data():
 
 													sp500_change90 = ((float(sp500_value90) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
 
-													print '90', sp500_value90
+													#print '90', sp500_value90
 
 												except:
 													end_date90 = end_date90 - datetime.timedelta(days=3)
-													print "Except end_date90", end_date90
+													#print "Except end_date90", end_date90
 													row90 = sp500_df[(sp500_df.index == str(end_date90))]
 													sp500_value90 = float(row90["Adjusted Close"])
 
@@ -233,14 +234,18 @@ def pull_data():
 													if "long" in findPatDisclosure[0]:
 														#print "long"
 														direction = "long"
+														direction_num = 1
 													elif "short" in findPatDisclosure[0]:
 														#print "short"
 														direction = "short"
+														direction_num = 2
 													elif "no position" in findPatDisclosure[0]:
 														#print "no position"
 														direction = "no position"
+														direction_num = 3
 												except:
 													direction = "NA"
+													direction_num = 4
 
 												try:
 
@@ -262,14 +267,61 @@ def pull_data():
 													patFindEditor = re.compile('<meta name="news_keywords" content="(.*) Picks"')
 													findPatEditor = re.findall(patFindEditor, source)
 													if "Editors'" in str(findPatEditor):
-														findPatEditor = "Editors Pick"
+														findPatEditor = 1 #"Editor"
 													else:
-														findPatEditor = "Regular"
+														findPatEditor = 2 #"Regular"
 												except:
-													findPatEditor = "NA"
+													findPatEditor = 3 #"NA"
 
 												try:
-													df = df.append({'Date': str(findPatDate[0]), 'Ticker': findPatTicker, 'Title': str(findPatTitle[0]), 'Direction': direction, 'Market Cap': str(findPatMCap[0]), 'Editor-Picks': findPatEditor, 'Author-Followers': findPatFollowers[0], 'Initial-Stock-Price': str(initial_stock_value), 'Current-Stock-Price10': str(current_stock_value10), 'Current-Stock-Price30': str(current_stock_value30), 'Current-Stock-Price90': str(current_stock_value90), 'sp500-Price10': str(sp500_value10), 'sp500-Price30': str(sp500_value30), 'sp500-Price90': str(sp500_value90), 'stock_change10': stock_change10, 'stock_change30': stock_change30, 'stock_change90': stock_change90, 'sp500_change10': sp500_change10, 'sp500_change30':sp500_change30, 'sp500_change90': sp500_change90}, ignore_index=True)
+													difference10 = stock_change10 - sp500_change10
+													difference30 = stock_change30 - sp500_change30
+													difference90 = stock_change90 - sp500_change90
+
+													if difference10 > 0 and direction == "long":
+														status10 = 1
+													elif difference10 < 0 and direction == "short":
+														status10 = 1
+													elif difference10 > 0 and direction == "no position":
+														status10 = 1
+													elif difference10 > 0 and direction == "NA":
+														status10 = 1
+													else:
+														status10 = 0
+
+													if difference30 > 0 and direction == "long":
+														status30 = 1
+													elif difference30 < 0 and direction == "short":
+														status30 = 1
+													elif difference30 > 0 and direction == "no position":
+														status30 = 1
+													elif difference30 > 0 and direction == "NA":
+														status30 = 1
+													else:
+														status30 = 0
+
+													if difference90 > 0 and direction == "long":
+														status90 = 1
+													elif difference10 < 0 and direction == "short":
+														status90 = 1
+													elif difference90 > 0 and direction == "no position":
+														status90 = 1
+													elif difference90 > 0 and direction == "NA":
+														status90 = 1
+													else:
+														status90 = 0
+
+												except:
+													pass
+
+												try:
+													tokenize = "test"
+
+												except:
+													pass
+
+												try:
+													df = df.append({'Date': str(findPatDate[0]), 'Ticker': findPatTicker, 'Title': str(findPatTitle[0]), 'Direction': direction, 'Direction_Num':direction_num, 'Market Cap': str(findPatMCap[0]), 'Editor-Picks': findPatEditor, 'Author-Followers': findPatFollowers[0], 'Initial-Stock-Price': str(initial_stock_value), 'Current-Stock-Price10': str(current_stock_value10), 'Current-Stock-Price30': str(current_stock_value30), 'Current-Stock-Price90': str(current_stock_value90), 'sp500-Price10': str(sp500_value10), 'sp500-Price30': str(sp500_value30), 'sp500-Price90': str(sp500_value90), 'stock_change10': stock_change10, 'stock_change30': stock_change30, 'stock_change90': stock_change90, 'sp500_change10': sp500_change10, 'sp500_change30':sp500_change30, 'sp500_change90': sp500_change90, 'difference10':difference10, 'difference30':difference30, 'difference90':difference90, 'status10':status10, 'status30':status30, 'status90':status90}, ignore_index=True)
 
 													print "Complete DF"
 
@@ -329,5 +381,7 @@ def pull_data():
 			pass
 
 		df.to_csv("seeking_alpha_stats.csv")
+
+		print "Complete File"
 
 pull_data()
