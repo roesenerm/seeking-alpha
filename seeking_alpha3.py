@@ -12,11 +12,11 @@ from yahoo_finance import Share
 
 def pull_data():
 
-	df = pd.DataFrame(columns = ['Date', 'Ticker', 'Title', 'Direction', 'Market Cap', 'Editor-Picks', 'Author-Followers', 'Initial-Stock-Price', 'Current-Stock-Price10', 'Current-Stock-Price30', 'Current-Stock-Price90', 'sp500-Price10', 'sp500-Price30', 'sp500-Price90'])
+	df = pd.DataFrame(columns = ['Date', 'Ticker', 'Title', 'Direction', 'Market Cap', 'Editor-Picks', 'Author-Followers', 'Initial-Stock-Price', 'Current-Stock-Price10', 'Current-Stock-Price30', 'Current-Stock-Price90', 'sp500-Price10', 'sp500-Price30', 'sp500-Price90', 'stock_change10', 'stock_change30', 'stock_change90', 'sp500_change10', 'sp500_change30', 'sp500_change90'])
 
 	sp500_df = pd.DataFrame.from_csv("YAHOO-INDEX_GSPC.csv")
 
-	d1 = date(2014, 10, 20)
+	d1 = date(2014, 10, 1)
 	d2 = date(2014, 10, 26)
 
 	delta = d2 - d1
@@ -102,173 +102,222 @@ def pull_data():
 
 										findPatTicker = re.findall(patFinderTicker, source)
 
-										try:
+										print findPatTicker
 
-											end_date = a_date + datetime.timedelta(days=1)
+										findPatTicker = str(findPatTicker[0])
 
-											value = Share(findPatTicker[0])
-
-											initial_stock_value = value.get_historical(str(a_date), str(end_date))
-
-											initial_stock_value = initial_stock_value[0]['Adj_Close']
-
-										except:
-											initial_stock_value = "NA"
+										print findPatTicker
 
 										try:
 
 											try:
 
-												value = Share(findPatTicker[0])
+												value = Share(findPatTicker)
 
 											except:
 												print "no value!!!!!!!!!!!!!"
 
-											#current_stock_value = value.get_price()
-
 											try:
 
-												end_date10 = a_date + datetime.timedelta(days=10)
-												end_date30 = a_date + datetime.timedelta(days=30)
-												end_date90 = a_date + datetime.timedelta(days=90)
+												end_date = a_date + datetime.timedelta(days=1)
 
-												current_stock_value10 = value.get_historical(str(a_date), str(end_date10))[0]['Adj_Close']
-												current_stock_value30 = value.get_historical(str(a_date), str(end_date30))[0]['Adj_Close']
-												current_stock_value90 = value.get_historical(str(a_date), str(end_date90))[0]['Adj_Close']
-
-											except:
-												print "no current stock value!!!!!!!!!!!!!"
+												value = Share(findPatTicker)
 
 
-											try:
+												initial_stock_value = value.get_historical(str(a_date), str(end_date))
 
-												row10 = sp500_df[(sp500_df.index == str(end_date10))]
-												sp500_value10 = float(row10["Adjusted Close"])
+												print initial_stock_value
 
-												print "10", sp500_value10
+												initial_stock_value = initial_stock_value[0]['Adj_Close']
 
-											except:
-												end_date10 = end_date10 - datetime.timedelta(days=3)
-												print "Except end_date10", end_date10
-												row10 = sp500_df[(sp500_df.index == str(end_date10))]
-												sp500_value10 = float(row10["Adjusted Close"])
+												print "Initial Stock Value: ", initial_stock_value
 
-											try:
+												try:
 
-												row30 = sp500_df[(sp500_df.index == str(end_date30))]
-												sp500_value30 = float(row30["Adjusted Close"])
+													row = sp500_df[(sp500_df.index == str(end_date))]
+													initial_sp500_value = float(row["Adjusted Close"])
 
-												print '30', sp500_value30
+													print "sp500 Value", sp500_value
 
-											except:
-												end_date30 = end_date30 - datetime.timedelta(days=3)
-												print "Except end_date30", end_date30
-												row30 = sp500_df[(sp500_df.index == str(end_date30))]
-												sp500_value30 = float(row30["Adjusted Close"])
+												except:
+													end_date = end_date - datetime.timedelta(days=3)
+													print "Except end_date", end_date
+													row = sp500_df[(sp500_df.index == str(end_date))]
+													initial_sp500_value = float(row["Adjusted Close"])
 
-											try:
+												try:
 
-												row90 = sp500_df[(sp500_df.index == str(end_date90))]
-												sp500_value90 = float(row90["Adjusted Close"])
+													end_date10 = a_date + datetime.timedelta(days=10)
+													end_date30 = a_date + datetime.timedelta(days=30)
+													end_date90 = a_date + datetime.timedelta(days=90)
 
-												print '90', sp500_value90
+													current_stock_value10 = value.get_historical(str(a_date), str(end_date10))[0]['Adj_Close']
+													current_stock_value30 = value.get_historical(str(a_date), str(end_date30))[0]['Adj_Close']
+													current_stock_value90 = value.get_historical(str(a_date), str(end_date90))[0]['Adj_Close']
 
-											except:
-												end_date90 = end_date90 - datetime.timedelta(days=3)
-												print "Except end_date90", end_date90
-												row90 = sp500_df[(sp500_df.index == str(end_date90))]
-												sp500_value90 = float(row90["Adjusted Close"])
+													try:
+														print "okay?"
+														stock_change10 = ((float(current_stock_value10) - float(initial_stock_value)) / float(initial_stock_value)) * 100
+														stock_change30 = ((float(current_stock_value30) - float(initial_stock_value)) / float(initial_stock_value)) * 100
+														stock_change90 = ((float(current_stock_value90) - float(initial_stock_value)) / float(initial_stock_value)) * 100
+														print "yes"
+
+													except:
+														stock_change10 = "NA"
+														stock_change30 = "NA"
+														stock_change90 = "NA"
+
+												except:
+													print "no current stock value!!!!!!!!!!!!!"
+
+
+												try:
+
+													row10 = sp500_df[(sp500_df.index == str(end_date10))]
+													sp500_value10 = float(row10["Adjusted Close"])
+
+													sp500_change10 = ((float(sp500_value10) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
+
+													print "10", sp500_value10
+
+												except:
+													end_date10 = end_date10 - datetime.timedelta(days=3)
+													print "Except end_date10", end_date10
+													row10 = sp500_df[(sp500_df.index == str(end_date10))]
+													sp500_value10 = float(row10["Adjusted Close"])
+
+													sp500_change10 = ((float(sp500_value10) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
+
+												try:
+
+													row30 = sp500_df[(sp500_df.index == str(end_date30))]
+													sp500_value30 = float(row30["Adjusted Close"])
+
+													sp500_change30 = ((float(sp500_value30) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
+
+													print '30', sp500_value30
+
+												except:
+													end_date30 = end_date30 - datetime.timedelta(days=3)
+													print "Except end_date30", end_date30
+													row30 = sp500_df[(sp500_df.index == str(end_date30))]
+													sp500_value30 = float(row30["Adjusted Close"])
+
+													sp500_change30 = ((float(sp500_value30) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
+
+												try:
+
+													row90 = sp500_df[(sp500_df.index == str(end_date90))]
+													sp500_value90 = float(row90["Adjusted Close"])
+
+													sp500_change90 = ((float(sp500_value90) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
+
+													print '90', sp500_value90
+
+												except:
+													end_date90 = end_date90 - datetime.timedelta(days=3)
+													print "Except end_date90", end_date90
+													row90 = sp500_df[(sp500_df.index == str(end_date90))]
+													sp500_value90 = float(row90["Adjusted Close"])
+
+													sp500_change90 = ((float(sp500_value90) - float(initial_sp500_value)) / float(initial_sp500_value)) * 100
+
+												try:
+
+													patFinderDisclosure = re.compile("<strong>Disclosure: </strong>The author (.*) <span")
+
+													findPatDisclosure = re.findall(patFinderDisclosure, source)
+
+													#print findPatDisclosure
+
+													if "long" in findPatDisclosure[0]:
+														#print "long"
+														direction = "long"
+													elif "short" in findPatDisclosure[0]:
+														#print "short"
+														direction = "short"
+													elif "no position" in findPatDisclosure[0]:
+														#print "no position"
+														direction = "no position"
+												except:
+													direction = "NA"
+
+												try:
+
+													patFinderMCap = re.compile('primaryMarketCap = (.*);')
+
+													findPatMCap = re.findall(patFinderMCap, source)
+
+												except:
+													findPatMCap = "NA"
+
+												try:
+													patFindFollowers = re.compile("class='follow_clicks_author'>(.*)</span>")
+													findPatFollowers = re.findall(patFindFollowers, source)
+
+												except:
+													findPatFollowers = ["NA"]
+
+												try:
+													patFindEditor = re.compile('<meta name="news_keywords" content="(.*) Picks"')
+													findPatEditor = re.findall(patFindEditor, source)
+													if "Editors'" in str(findPatEditor):
+														findPatEditor = "Editors Pick"
+													else:
+														findPatEditor = "Regular"
+												except:
+													findPatEditor = "NA"
+
+												try:
+													df = df.append({'Date': str(findPatDate[0]), 'Ticker': findPatTicker, 'Title': str(findPatTitle[0]), 'Direction': direction, 'Market Cap': str(findPatMCap[0]), 'Editor-Picks': findPatEditor, 'Author-Followers': findPatFollowers[0], 'Initial-Stock-Price': str(initial_stock_value), 'Current-Stock-Price10': str(current_stock_value10), 'Current-Stock-Price30': str(current_stock_value30), 'Current-Stock-Price90': str(current_stock_value90), 'sp500-Price10': str(sp500_value10), 'sp500-Price30': str(sp500_value30), 'sp500-Price90': str(sp500_value90), 'stock_change10': stock_change10, 'stock_change30': stock_change30, 'stock_change90': stock_change90, 'sp500_change10': sp500_change10, 'sp500_change30':sp500_change30, 'sp500_change90': sp500_change90}, ignore_index=True)
+
+													print "Complete DF"
+
+												except Exception as e:
+													print "DF Error!", e
+
+													print 'Date', str(findPatDate[0])
+													print 'Ticker', str(findPatTicker[0])
+													print 'Title', str(findPatTitle[0])
+													print 'Direction', direction
+													print 'Market Cap', str(findPatMCap[0])
+													print 'Editor-Picks', findPatEditor
+													print 'Author-Followers', findPatFollowers[0]
+													print 'Initial-Stock-Price', str(initial_stock_value)
+													print 'Current-Stock-Price10', str(current_stock_value10)
+													print 'Current-Stock-Price30', str(current_stock_value30)
+													print 'Current-Stock-Price90', str(current_stock_value90)
+													print 'sp500-Price10', str(sp500_value10)
+													print 'sp500-Price30', str(sp500_value30)
+													print 'sp500-Price90', str(sp500_value90)
+													print 'stock_change10', stock_change10
+													print 'stock_change30', stock_change30
+													print 'stock_change90', stock_change90
+													print "Error Complete"
+													pass
+
+
+											except Exception as e:
+												print "No Initial Stock Value", e
 
 										except:
 											print "NA everything"
-											current_stock_value10 = 'NA'
-											current_stock_value30 = 'NA'
-											current_stock_value90 = 'NA'
-
-											sp500_value10 = "NA"
-											sp500_value30 = "NA"
-											sp500_value90 = "NA"
-
 
 									except:
-										findPatTicker = ["NA"]
-
-
-									try:
-
-										patFinderDisclosure = re.compile("<strong>Disclosure: </strong>The author (.*) <span")
-
-										findPatDisclosure = re.findall(patFinderDisclosure, source)
-
-										#print findPatDisclosure
-
-										if "long" in findPatDisclosure[0]:
-											#print "long"
-											direction = "long"
-										elif "short" in findPatDisclosure[0]:
-											#print "short"
-											direction = "short"
-										elif "no position" in findPatDisclosure[0]:
-											#print "no position"
-											direction = "no position"
-									except:
-										direction = "NA"
-
-									try:
-
-										patFinderMCap = re.compile('primaryMarketCap = (.*);')
-
-										findPatMCap = re.findall(patFinderMCap, source)
-
-									except:
-										findPatMCap = "NA"
-
-									'''
-									try:
-										patFindPopular = re.compile('<meta name="twitter:site" content="@sa_(.*)">')
-										findPatPopular = re.findall(patFindPopular, source)
-										if findPatPopular[0] == "popular":
-											findPatPopular = "Popular"
-										else:
-											findPatPopular = "Not Popular"
-
-									except:
-										findPatPopular = "NA"
-									'''
-									try:
-										patFindFollowers = re.compile("class='follow_clicks_author'>(.*)</span>")
-										findPatFollowers = re.findall(patFindFollowers, source)
-
-									except:
-										findPatFollowers = ["NA"]
-
-									try:
-										patFindEditor = re.compile('<meta name="news_keywords" content="(.*) Picks"')
-										findPatEditor = re.findall(patFindEditor, source)
-										if "Editors'" in str(findPatEditor):
-											findPatEditor = "Editors Pick"
-										else:
-											findPatEditor = "Regular"
-									except:
-										findPatEditor = "NA"
-
-									try:
-										df = df.append({'Date': str(findPatDate[0]), 'Ticker': str(findPatTicker[0]), 'Title': str(findPatTitle[0]), 'Direction': direction, 'Market Cap': str(findPatMCap[0]), 'Editor-Picks': findPatEditor, 'Author-Followers': findPatFollowers[0], 'Initial-Stock-Price': str(initial_stock_value), 'Current-Stock-Price10': str(current_stock_value10), 'Current-Stock-Price30': str(current_stock_value30), 'Current-Stock-Price90': str(current_stock_value90), 'sp500-Price10': str(sp500_value10), 'sp500-Price30': str(sp500_value30), 'sp500-Price90': str(sp500_value90)}, ignore_index=True)
-
-									except Exception as e:
-										print "DF Error!", e
+										print "No Ticker"
 										pass
+
 
 								except Exception as e:
 									print "Source Error", e
 									pass
 
 						except Exception as e:
-							print "omg!", e
+							print "No Link", e
 							pass
 
 				except Exception as e:
-					print "What!!", e
+					print "No item in Link Pattern", e
 					pass
 
 			except Exception as e:

@@ -8,6 +8,7 @@ from cookielib import CookieJar
 import datetime
 from datetime import date, timedelta as td
 from yahoo_finance import Share
+import nltk
 
 
 def pull_data():
