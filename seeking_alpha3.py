@@ -16,8 +16,8 @@ def pull_data():
 
 	sp500_df = pd.DataFrame.from_csv("YAHOO-INDEX_GSPC.csv")
 
-	d1 = date(2014, 10, 1)
-	d2 = date(2014, 10, 26)
+	d1 = date(2014, 1, 1)
+	d2 = date(2014, 12, 31)
 
 	delta = d2 - d1
 
@@ -225,25 +225,47 @@ def pull_data():
 
 												try:
 
-													patFinderDisclosure = re.compile("<strong>Disclosure: </strong>The author (.*) <span")
+													try:
 
-													findPatDisclosure = re.findall(patFinderDisclosure, source)
+														patFinderDisclosure = re.compile("<strong>Disclosure: </strong>(.*) <span")
 
-													#print findPatDisclosure
+														findPatDisclosure = re.findall(patFinderDisclosure, source)
 
-													if "long" in findPatDisclosure[0]:
-														#print "long"
-														direction = "long"
-														direction_num = 1
-													elif "short" in findPatDisclosure[0]:
-														#print "short"
-														direction = "short"
-														direction_num = 2
-													elif "no position" in findPatDisclosure[0]:
-														#print "no position"
-														direction = "no position"
-														direction_num = 3
+														if "long" in findPatDisclosure[0]:
+															#print "long"
+															direction = "long"
+															direction_num = 1
+														elif "short" in findPatDisclosure[0]:
+															#print "short"
+															direction = "short"
+															direction_num = 2
+														elif "no position" or "no positions" in findPatDisclosure[0]:
+															#print "no position"
+															direction = "no position"
+															direction_num = 3
+
+													except:
+
+														patFinderDisclosure = re.compile("<strong>Disclosure: </strong>(.*)</p>")
+
+														findPatDisclosure = re.findall(patFinderDisclosure, source)
+
+														if "long" in findPatDisclosure[0]:
+															#print "long"
+															direction = "long"
+															direction_num = 1
+														elif "short" in findPatDisclosure[0]:
+															#print "short"
+															direction = "short"
+															direction_num = 2
+														elif "no position" or "no positions" in findPatDisclosure[0]:
+															#print "no position"
+															direction = "no position"
+															direction_num = 3
+
+
 												except:
+													print "not working?"
 													direction = "NA"
 													direction_num = 4
 
@@ -278,35 +300,35 @@ def pull_data():
 													difference30 = stock_change30 - sp500_change30
 													difference90 = stock_change90 - sp500_change90
 
-													if difference10 > 0 and direction == "long":
+													if difference10 > 5 and direction == "long":
 														status10 = 1
-													elif difference10 < 0 and direction == "short":
+													elif difference10 < 5 and direction == "short":
 														status10 = 1
-													elif difference10 > 0 and direction == "no position":
+													elif difference10 > 5 and direction == "no position":
 														status10 = 1
-													elif difference10 > 0 and direction == "NA":
+													elif difference10 > 5 and direction == "NA":
 														status10 = 1
 													else:
 														status10 = 0
 
-													if difference30 > 0 and direction == "long":
+													if difference30 > 5 and direction == "long":
 														status30 = 1
-													elif difference30 < 0 and direction == "short":
+													elif difference30 < 5 and direction == "short":
 														status30 = 1
-													elif difference30 > 0 and direction == "no position":
+													elif difference30 > 5 and direction == "no position":
 														status30 = 1
-													elif difference30 > 0 and direction == "NA":
+													elif difference30 > 5 and direction == "NA":
 														status30 = 1
 													else:
 														status30 = 0
 
-													if difference90 > 0 and direction == "long":
+													if difference90 > 5 and direction == "long":
 														status90 = 1
-													elif difference10 < 0 and direction == "short":
+													elif difference10 < 5 and direction == "short":
 														status90 = 1
-													elif difference90 > 0 and direction == "no position":
+													elif difference90 > 5 and direction == "no position":
 														status90 = 1
-													elif difference90 > 0 and direction == "NA":
+													elif difference90 > 5 and direction == "NA":
 														status90 = 1
 													else:
 														status90 = 0
@@ -380,8 +402,8 @@ def pull_data():
 			print 'No Webpage', e
 			pass
 
-		df.to_csv("seeking_alpha_stats.csv")
+		df.to_csv("seeking_alpha_stats_enhanced2.csv")
 
-		print "Complete File"
+	print "Complete File"
 
 pull_data()

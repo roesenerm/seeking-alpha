@@ -8,11 +8,11 @@ style.use("ggplot")
 Features = ["Author-Followers", "Market Cap", "Direction_Num", "Editor-Picks"]
 
 def build_data_set(features = Features):
-	data_df = pd.DataFrame.from_csv("seeking_alpha_stats.csv")
+	data_df = pd.DataFrame.from_csv("seeking_alpha_stats_enhanced.csv")
 
 	X = np.array(data_df[features].values)
 
-	y = (data_df["status30"].values.tolist())
+	y = (data_df["status10"].values.tolist())
 
 	X = preprocessing.scale(X)
 
@@ -25,7 +25,7 @@ def build_data_set(features = Features):
 
 def analysis():
 
-	test_size = 100
+	test_size = 200
 	X, y = build_data_set()
 
 	print len(X)
